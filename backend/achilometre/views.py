@@ -13,7 +13,7 @@ def custom_logout(request):
 
 class TaskListView(LoginRequiredMixin, ListView):
     model = Task
-    template_name = 'tasks_list.html'
+    template_name = 'todos/tasks_list.html'
 
     def get_queryset(self):
         return Task.objects.filter(user=self.request.user)

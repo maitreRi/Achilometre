@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Supprimer une tâche{% endblock %}
+
+{% block content %}
+<h2 class="text-2xl font-bold mb-4 text-red-600">Confirmer la suppression</h2>
+
+<p class="mb-4">Es-tu sûr de vouloir supprimer la tâche suivante ?</p>
+
+<div class="bg-white p-4 rounded shadow max-w-xl mb-4">
+    <p class="font-semibold">{{ object.title }}</p>
+    <p class="text-sm text-gray-600">{{ object.due_date }}</p>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+        Supprimer
+    </button>
+    <a href="{% url 'task_list' %}" class="ml-4 text-gray-600 hover:underline">Annuler</a>
+</form>
+{% endblock %}

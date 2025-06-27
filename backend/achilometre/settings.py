@@ -58,7 +58,7 @@ ROOT_URLCONF = 'achilometre.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "backend/templates"],
+        'DIRS': [BASE_DIR / "backend" / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

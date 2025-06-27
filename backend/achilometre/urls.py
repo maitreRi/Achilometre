@@ -8,8 +8,6 @@ from todos.views import custom_logout
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
-    # # Auth (connexion/déconnexion)
     path('login/',
          auth_views.LoginView.as_view(template_name='auth/login.html'),
          name='login'),

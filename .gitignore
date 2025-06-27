@@ -1,0 +1,35 @@
+# .gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+
+# Django
+*.pyc
+*.pyo
+env/
+*.env
+db.sqlite3
+/media
+/staticfiles
+
+# Tailwind/django-tailwind
+theme/node_modules/
+theme/static_src/
+
+# Docker
+*.pid
+*.swp
+*.sock
+.env
+.vscode/
+*.DS_Store
+
+# Virtual environments
+.venv/
+env/
+venv/
+# Folders
+/Dko

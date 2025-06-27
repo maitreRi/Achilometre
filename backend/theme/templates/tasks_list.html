@@ -1,0 +1,15 @@
+<!-- templates/tasks_list.html -->
+<h1 class="text-2xl font-bold mb-4">Mes tâches</h1>
+
+<ul class="space-y-2">
+  {% for task in object_list %}
+    <li class="p-4 bg-white rounded shadow">
+      <strong>{{ task.title }}</strong> — {{ task.status }}
+      <div class="text-sm text-gray-500">{{ task.due_date }}</div>
+    </li>
+  {% empty %}
+    <li>Aucune tâche pour le moment.</li>
+  {% endfor %}
+</ul>
+
+<a href="{% url 'task_add' %}" class="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded">Ajouter une tâche</a>

@@ -11,19 +11,49 @@
 <body class="bg-gray-100 min-h-screen">
     <header class="bg-white shadow p-4 mb-6">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold"><a href="{% url 'task_list' %}">Achilomètre</a></h1>
-            <nav>            
+            <!-- Bloc gauche : Logo + navigation -->
+            <div class="flex items-center space-x-6">
+                <h1 class="text-xl font-bold">
+                    <a href="{% url 'task_list' %}">Achilomètre</a>
+                </h1>
+                <nav class="text-sm text-gray-700 space-x-4">
+                    <a href="{% url 'task_list' %}" class="hover:underline">Mes tâches</a>
+                    <a href="{% url 'chess_room' %}" class="hover:underline">Salle d’échecs</a>
+                </nav>
+            </div>
+
+            <!-- Bloc droit : Auth utilisateur -->
+            <div class="text-sm">
                 {% if user.is_authenticated %}
-                    <span class="mr-4">Bonjour {{ user.username }}</span>
-                    <a href="{% url 'logout' %}" class="text-red-600 hover:underline">Déconnexion</a>
+                    <span class="mr-2">Bonjour, {{ user.username }}</span>
+                    <a href="{% url 'logout' %}" class="hover:underline">Déconnexion</a>
                 {% else %}
-                    <a href="{% url 'login' %}" class="text-blue-600 hover:underline">Connexion</a>
+                    <a href="{% url 'login' %}" class="hover:underline">Connexion</a>
                 {% endif %}
-            </nav>
+            </div>
         </div>
     </header>
 
     <main class="container mx-auto px-4">
+        {% if messages %}
+        <div id="messages" class="fixed top-0 right-0 m-4 space-y-2 z-50">
+            {% for message in messages %}
+            <div class="px-4 py-2 rounded {{ message.tags }} bg-green-500 text-white shadow">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+
+        <script>
+            setTimeout(() => {
+                const messages = document.getElementById("messages");
+                if (messages) {
+                    messages.remove();
+                }
+            }, 3000);
+        </script>
+        {% endif %}
+
         {% block content %}{% endblock %}
     </main>
 </body>

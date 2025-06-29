@@ -1,9 +1,10 @@
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from .models import Task
+from ..models import Task
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import logout
 from django.shortcuts import redirect
+from django.contrib import messages
 
 
 def custom_logout(request):
@@ -28,6 +29,7 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
+        messages.success(self.request, "Tâche créée avec succès.")
         return super().form_valid(form)
 
 
@@ -37,8 +39,16 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'todos/task_form.html'
     success_url = reverse_lazy('task_list')
 
+    def form_valid(self, form):
+        messages.success(self.request, "Tâche mise à jour avec succès.")
+        return super().form_valid(form)
+
 
 class TaskDeleteView(LoginRequiredMixin, DeleteView):
     model = Task
     template_name = 'todos/task_confirm_delete.html'
     success_url = reverse_lazy('task_list')
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, "Tâche supprimée avec succès.")
+        return super().delete(request, *args, **kwargs)

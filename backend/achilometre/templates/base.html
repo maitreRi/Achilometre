@@ -6,6 +6,7 @@
     <title>{% block title %}Achilomètre{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {%load static%}
+    {% load tz %}
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -44,13 +45,26 @@
 
     <main class="container mx-auto px-4">
         {% if messages %}
-        <div id="messages" class="fixed top-0 right-0 m-4 space-y-2 z-50">
-            {% for message in messages %}
-            <div class="px-4 py-2 rounded {{ message.tags }} bg-green-500 text-white shadow">
-                {{ message }}
+        <div id="messages" class="fixed top-4 right-4 space-y-2 z-50 transition-opacity duration-500 opacity-100">
+        {% for message in messages %}
+            <div class="px-4 py-2 rounded shadow bg-green-500 text-white animate-fade-in-out">
+            {{ message }}
             </div>
-            {% endfor %}
+        {% endfor %}
         </div>
+
+        <style>
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+
+        .animate-fade-in-out {
+            animation: fadeOut 3s ease forwards;
+        }
+        </style>
+
 
         <script>
             setTimeout(() => {

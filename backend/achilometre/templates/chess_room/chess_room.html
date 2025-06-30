@@ -20,8 +20,8 @@
   const game = new Chess();
   const board = Chessboard('board', {
     draggable: true,
-    position: 'start',
     pieceTheme: '/static/chessboard/img/chesspieces/{piece}.png',
+    position: 'start',
     onDrop: (source, target) => {
       const move = game.move({
         from: source,
@@ -30,8 +30,19 @@
       });
 
       if (move === null) return 'snapback';
-
       updateHistory();
+
+      if (game.game_over()) {
+        setTimeout(() => {
+          let msg = 'Partie terminée : ';
+          if (game.in_checkmate()) msg += 'Échec et mat !';
+          else if (game.in_draw()) msg += 'Match nul.';
+          else if (game.in_stalemate()) msg += 'Pat.';
+          else msg += 'Fin de partie.';
+
+          alert(msg);
+        }, 100);
+      }
     }
   });
 

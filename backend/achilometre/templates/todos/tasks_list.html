@@ -7,7 +7,22 @@
 
 <ul class="space-y-4">
   {% for task in object_list %}
-    <li class="p-4 bg-white rounded shadow">
+  <li class="p-4 rounded shadow flex items-center justify-between
+      {% if task.status == 'done' %}
+          bg-gray-100 opacity-60
+      {% elif task.percentage_left > 50 %}
+          bg-green-100
+      {% elif task.percentage_left > 25 %}
+          bg-yellow-100
+      {% elif task.percentage_left > 0 %}
+          bg-red-100
+      {% else %}
+          bg-black text-white
+      {% endif %}">
+        <div class="flex items-start gap-3">
+          <input type="checkbox" data-id="{{ task.id }}" {% if task.status == 'done' %}checked{% endif %}
+                class="task-checkbox mt-1">
+          <div>
       <!-- Titre cliquable -->
       <button type="button" class="w-full text-left flex justify-between items-center focus:outline-none" onclick="toggleDetails('details-{{ task.pk }}')">
         <span class="font-semibold text-lg">{{ task.title }}</span>
@@ -33,6 +48,18 @@
     <li class="text-gray-500">Aucune tâche pour le moment.</li>
   {% endfor %}
 </ul>
+<h2 class="text-xl font-bold mt-8 mb-2">Tâches terminées</h2>
+<ul class="space-y-2">
+  {% for task in completed_tasks %}
+    <li class="p-3 bg-gray-200 rounded text-sm line-through">
+      {{ task.title }}
+      <small class="text-gray-500">(terminée le {{ task.updated_at|date:"d/m/Y" }})</small>
+    </li>
+  {% empty %}
+    <li class="text-gray-500">Aucune tâche terminée.</li>
+  {% endfor %}
+</ul>
+
 
 <script>
   function toggleDetails(id) {
@@ -47,5 +74,14 @@
       icon.classList.remove('rotate-180');
     }
   }
+
+  $('.task-checkbox').on('change', function () {
+    const taskId = $(this).data('id');
+    fetch(`/task/${taskId}/toggle/`, {
+      method: 'POST',
+      headers: {'X-CSRFToken': '{{ csrf_token }}'}
+    }).then(() => location.reload());
+  });
+
 </script>
 {% endblock %}

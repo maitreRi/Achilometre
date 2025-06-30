@@ -21,5 +21,9 @@
     "postcss-simple-vars": "^7.0.1",
     "rimraf": "^6.0.1",
     "tailwindcss": "^4.1.11"
+  },
+  "dependencies": {
+    "@lichess-org/chessground": "^9.2.3",
+    "chess.js": "^1.4.0"
   }
 }

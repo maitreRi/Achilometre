@@ -5,8 +5,16 @@
     <meta charset="UTF-8">
     <title>{% block title %}Achilomètre{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {%load static%}
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- ChessBoard -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+    <!-- ChessRules -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+
 </head>
 <body class="bg-gray-100 min-h-screen">
     <header class="bg-white shadow p-4 mb-6">

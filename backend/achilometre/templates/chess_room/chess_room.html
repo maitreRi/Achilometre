@@ -1,13 +1,57 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <div class="max-w-4xl mx-auto mt-10 text-center">
-    <h1 class="text-3xl font-bold mb-4">Salle d’échecs</h1>
-    <p class="mb-6 text-gray-600">Bienvenue dans la salle d’échecs. (Fonctionnalité en cours...)</p>
+<div class="max-w-5xl mx-auto mt-10 text-center">
+  <h1 class="text-3xl font-bold mb-4">Salle d’échecs</h1>
+  <p class="mb-6 text-gray-600">Jouez librement sur l’échiquier interactif ci-dessous.</p>
 
-    <!-- Placeholder du futur échiquier -->
-    <div class="w-[400px] h-[400px] mx-auto bg-gray-200 rounded shadow flex items-center justify-center">
-      <span class="text-gray-500">Échiquier ici</span>
+  <div class="flex flex-col md:flex-row justify-center gap-10">
+    <div id="board" style="width: 400px; height: 400px;"></div>
+
+    <div class="text-left max-w-xs w-full">
+      <h2 class="text-xl font-semibold mb-2">Historique des coups</h2>
+      <ol id="move-history" class="list-decimal list-inside bg-white p-4 rounded shadow h-[400px] overflow-auto text-sm"></ol>
+      <button id="resetBtn" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Réinitialiser</button>
     </div>
   </div>
+</div>
+
+<script>
+  const game = new Chess();
+  const board = Chessboard('board', {
+    draggable: true,
+    position: 'start',
+    pieceTheme: '/static/chessboard/img/chesspieces/{piece}.png',
+    onDrop: (source, target) => {
+      const move = game.move({
+        from: source,
+        to: target,
+        promotion: 'q'
+      });
+
+      if (move === null) return 'snapback';
+
+      updateHistory();
+    }
+  });
+
+  function updateHistory() {
+    const history = game.history();
+    const historyList = document.getElementById('move-history');
+    historyList.innerHTML = '';
+    history.forEach((move, index) => {
+      const li = document.createElement('li');
+      li.textContent = move;
+      historyList.appendChild(li);
+    });
+  }
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    game.reset();
+    board.start();
+    updateHistory();
+  });
+</script>
+
+
 {% endblock %}

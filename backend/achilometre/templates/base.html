@@ -28,7 +28,6 @@
                     <a href="{% url 'home' %}">Achilomètre</a>
                 </h1>
                 <nav class="text-sm text-gray-700 space-x-4">
-                    <a href="{% url 'home' %}" class="text-blue-500 hover:underline">Accueil</a>
                     <a href="{% url 'task_list' %}" class="hover:underline">Mes tâches</a>
                     <a href="{% url 'chess_room' %}" class="hover:underline">Salle d’échecs</a>
                     <a href="{% url 'weather' %}" class="hover:underline">Météo</a>
@@ -102,6 +101,7 @@
 
         {% block content %}{% endblock %}
     </main>
+    {% block extra_js %}{% endblock %}
 </body>
 <script>
   (function(){
@@ -153,56 +153,4 @@
     });
   })();
 </script>
-
-
-{% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const calendarEl = document.getElementById('calendar');
-
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: 'dayGridMonth',
-      locale: 'fr',
-      selectable: true,
-      headerToolbar: {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridMonth,timeGridWeek'
-      },
-
-      // Création d’une tâche en cliquant sur une date
-      dateClick: function(info) {
-        const title = prompt("Nom de la tâche à ajouter pour le " + info.dateStr + " ?");
-        if (title) {
-          fetch("{% url 'add_task_api' %}", {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({ title: title, due_date: info.dateStr })
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              calendar.addEvent({ title: "📝 " + title, start: info.dateStr });
-              alert("Tâche ajoutée !");
-            } else {
-              alert("Erreur : " + data.error);
-            }
-          });
-        }
-      },
-
-      // Événements : tâches + météo
-      events: {{ calendar_events|safe }}
-    });
-
-    calendar.render();
-  });
-</script>
-{% endblock %}
-
-
 </html>

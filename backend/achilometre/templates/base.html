@@ -28,11 +28,32 @@
                 <nav class="text-sm text-gray-700 space-x-4">
                     <a href="{% url 'task_list' %}" class="hover:underline">Mes tâches</a>
                     <a href="{% url 'chess_room' %}" class="hover:underline">Salle d’échecs</a>
+                    <a href="{% url 'weather' %}" class="hover:underline">Météo</a>
                 </nav>
             </div>
-
-            <!-- Bloc droit : Auth utilisateur -->
+            <!-- background -->
+            <div class="ml-6 flex items-center space-x-2">
+            <button id="upload-bg-btn" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
+                Importer un fond
+            </button>
+            <input type="file" id="upload-bg-input" accept="image/*" style="display:none" />
+            </div>
+            <!-- Bloc droit : meteo + Auth utilisateur -->
             <div class="text-sm">
+                <!-- Météo Info -->
+                {% if global_weather.error %}
+                <div class="text-red-500 text-xs">{{ global_weather.error }}</div>
+                {% else %}
+                <div id="weather-info" class="flex items-right space-x-2 text-yellow-600">
+                    <span id="weather-city">{{ global_weather.city }}</span>
+                    <img src="{{ global_weather.icon }}" alt="weather icon" class="h-4 w-4 inline" id="weather-icon">
+                    <span id="weather-uv" class="{{ global_weather.uv.value.calss }}">
+                        UV: {{ global_weather.uv.value }}
+                    </span>
+                    <span id="weather-time" class="text-gray-500 text-xs">{{ global_weather.localtime }}</span>
+                </div>
+                {% endif %}
+                <!-- user auth -->
                 {% if user.is_authenticated %}
                     <span class="mr-2">Bonjour, {{ user.username }}</span>
                     <a href="{% url 'logout' %}" class="hover:underline">Déconnexion</a>
@@ -79,4 +100,55 @@
         {% block content %}{% endblock %}
     </main>
 </body>
+<script>
+  (function(){
+    const uploadBtn = document.getElementById('upload-bg-btn');
+    const uploadInput = document.getElementById('upload-bg-input');
+
+    // Quand on clique sur le bouton, on ouvre la fenêtre de sélection fichier
+    uploadBtn.addEventListener('click', () => {
+      uploadInput.click();
+    });
+
+    // Quand l'utilisateur choisit un fichier
+    uploadInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Vérifier que c'est bien une image
+      if (!file.type.startsWith('image/')) {
+        alert('Veuillez sélectionner une image valide.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const imageDataUrl = event.target.result;
+
+        // Appliquer l'image en fond de body
+        document.body.style.backgroundImage = `url('${imageDataUrl}')`;
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center center';
+        document.body.style.backgroundRepeat = 'no-repeat';
+
+        // Sauvegarder dans localStorage pour persistance
+        localStorage.setItem('userBackground', imageDataUrl);
+      };
+
+      reader.readAsDataURL(file);
+    });
+
+    // Charger le fond sauvegardé si existe au chargement
+    window.addEventListener('load', () => {
+      const savedBg = localStorage.getItem('userBackground');
+      if (savedBg) {
+        document.body.style.backgroundImage = `url('${savedBg}')`;
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center center';
+        document.body.style.backgroundRepeat = 'no-repeat';
+      }
+    });
+  })();
+</script>
+
 </html>

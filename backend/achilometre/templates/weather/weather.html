@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Météo à Palma{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-6 text-center">🌤️ Météo à Palma de Mallorca</h1>
+
+<div class="bg-white p-6 rounded-xl shadow-md max-w-xl mx-auto">
+  {% if global_weather.error %}
+    <div class="text-red-500">{{ global_weather.error }}</div>
+  {% else %}
+    <div class="flex items-center space-x-4 mb-4">
+      <img src="{{ global_weather.icon }}" alt="Météo" class="w-16 h-16">
+      <div>
+        <p class="text-xl font-semibold">{{ global_weather.condition_text }}</p>
+        <p class="text-sm text-gray-500">{{ global_weather.localtime }}</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 text-gray-700">
+      <div>
+        <p><strong>Ville :</strong> {{ global_weather.city }}, {{ global_weather.country }}</p>
+        <p><strong>Température :</strong> {{ global_weather.temp_c }}°C / {{ global_weather.temp_f }}°F</p>
+        <p><strong>Ressentie :</strong> {{ global_weather.feelslike_c }}°C</p>
+      </div>
+      <div>
+        <p><strong>Humidité :</strong> {{ global_weather.humidity }}%</p>
+        <p><strong>Vent :</strong> {{ global_weather.wind_kph }} km/h</p>
+        <p><strong>UV :</strong> <span class="{{ global_weather.uv.class }}">
+          {{ global_weather.uv.value|floatformat:1 }}
+        </span>
+        <span class="text-sm text-gray-500">(normal: {{ global_weather.uv.normal }})</span></p>
+      </div>
+    </div>
+
+    <div class="mt-6">
+      <h2 class="text-lg font-bold mb-2">Qualité de l'air 🌫️</h2>
+      <ul class="text-sm list-disc ml-6 text-gray-600 space-y-1">
+        <li>
+          <strong>CO :</strong>
+          <span class="{{ global_weather.air_quality.co.class }}">{{ global_weather.air_quality.co.value|floatformat:2 }}</span>
+          <span class="text-xs text-gray-500">(normal : {{ global_weather.air_quality.co.normal }})</span>
+        </li>
+        <li>
+          <strong>NO₂ :</strong>
+          <span class="{{ global_weather.air_quality.no2.class }}">{{ global_weather.air_quality.no2.value|floatformat:2 }}</span>
+          <span class="text-xs text-gray-500">(normal : {{ global_weather.air_quality.no2.normal }})</span>
+        </li>
+        <li>
+          <strong>O₃ :</strong>
+          <span class="{{ global_weather.air_quality.o3.class }}">{{ global_weather.air_quality.o3.value|floatformat:2 }}</span>
+          <span class="text-xs text-gray-500">(normal : {{ global_weather.air_quality.o3.normal }})</span>
+        </li>
+        <li>
+          <strong>PM2.5 :</strong>
+          <span class="{{ global_weather.air_quality.pm2_5.class }}">{{ global_weather.air_quality.pm2_5.value|floatformat:2 }}</span>
+          <span class="text-xs text-gray-500">(normal : {{ global_weather.air_quality.pm2_5.normal }})</span>
+        </li>
+        <li>
+          <strong>PM10 :</strong>
+          <span class="{{ global_weather.air_quality.pm10.class }}">{{ global_weather.air_quality.pm10.value|floatformat:2 }}</span>
+          <span class="text-xs text-gray-500">(normal : {{ global_weather.air_quality.pm10.normal }})</span>
+        </li>
+      </ul>
+    </div>
+    {% endif %}
+    <div class="mt-8 max-w-xl mx-auto bg-white p-6 rounded-xl shadow-md">
+      <h2 class="text-lg font-bold mb-4">Historique UV (2 derniers jours)</h2>
+      <canvas id="historyChart" width="400" height="250"></canvas>
+    </div>
+  {% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script>
+      const historyData = JSON.parse('{{ global_weather.history_json|escapejs }}');
+
+      const uvData = historyData.uv.map(item => ({ x: item.time, y: item.value }));
+      const ctx = document.getElementById('historyChart').getContext('2d');
+      const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          datasets: [
+            {
+              label: 'UV',
+              data: uvData,
+              borderColor: 'orange',
+              fill: false,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: {
+              type: 'time',
+              time: {
+                tooltipFormat: 'MMM D, HH:mm',
+                unit: 'hour',
+                displayFormats: {
+                  hour: 'HH:mm'
+                }
+              },
+              title: {
+                display: true,
+                text: 'Heure'
+              }
+            },
+            y1: {
+              position: 'left',
+              title: {
+                display: true,
+                text: 'Indice UV'
+              },
+              min: 0,
+              max: 12,
+            }
+          }
+        }
+      });
+    </script>
+
+  {% endblock %}
+</div>
+{% endblock %}

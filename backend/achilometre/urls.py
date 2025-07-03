@@ -3,7 +3,7 @@
 from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import todo_views, chess_room_views
+from .views import todo_views, chess_room_views, weather_views
 
 
 urlpatterns = [
@@ -36,4 +36,9 @@ urlpatterns = [
     path('chess_room/',
          chess_room_views.ChessRoomView.as_view(),
          name='chess_room'),
+    # weather
+    path('meteo/',
+         weather_views.WeatherView.as_view(),
+         name='weather'),
+
 ]

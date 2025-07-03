@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Accueil{% endblock %}
+
+{% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-xl mt-6">
+  <h1 class="text-2xl font-bold mb-4">👋 Bienvenue sur Achilomètre</h1>
+
+  <!-- Section météo -->
+  {% if weather.error %}
+    <p class="text-red-500">{{ weather.error }}</p>
+  {% else %}
+    <div class="bg-blue-50 p-4 rounded mb-6 flex items-center space-x-4">
+      <img src="{{ weather.icon }}" alt="Météo" class="w-12 h-12">
+      <div>
+        <p class="font-semibold">{{ weather.condition_text }}</p>
+        <p class="text-sm text-gray-600">Température : {{ weather.temp_c }}°C (ressentie {{ weather.feelslike_c }}°C)</p>
+        <p class="text-sm text-gray-600">Humidité : {{ weather.humidity }}%, Vent : {{ weather.wind_kph }} km/h</p>
+        <p class="text-sm text-gray-600">UV : {{ weather.uv.value|floatformat:1 }}</p>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="bg-white rounded-xl shadow p-4 mt-6">
+    <h2 class="text-xl font-semibold mb-4">📆 Calendrier des tâches et météo</h2>
+    <div id="calendar"></div>
+  </div>
+
+  <!-- Section tâches du jour -->
+  <h2 class="text-xl font-semibold mb-2 mt-6">📝 Tâches prévues pour aujourd'hui</h2>
+  {% if today_tasks %}
+    <ul class="list-disc ml-6 space-y-2 text-gray-800">
+      {% for task in today_tasks %}
+        <li>
+          <span class="font-medium">{{ task.title }}</span> 
+          {% if task.due_time %} — <span class="text-sm text-gray-500">{{ task.due_time|time:"H:i" }}</span>{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-gray-600 italic">Aucune tâche prévue aujourd'hui.</p>
+  {% endif %}
+</div>
+{% endblock %}

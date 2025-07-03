@@ -10,7 +10,31 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, time
 from django.utils.timezone import now, make_aware
+import json
 
+
+def add_task_api(request):
+    try:
+        data = json.loads(request.body)
+        title = data.get("title")
+        due_date_str = data.get("due_date")
+
+        if not title or not due_date_str:
+            return JsonResponse({"success": False, "error": "Données incomplètes"})
+
+        due_date = datetime.strptime(due_date_str, "%Y-%m-%d").date()
+
+        # Création de la tâche liée à l'utilisateur connecté
+        task = Task.objects.create(
+            title=title,
+            due_date=due_date,
+            user=request.user
+        )
+
+        return JsonResponse({"success": True})
+
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)})
 
 @csrf_exempt
 @require_POST
@@ -55,7 +79,6 @@ class TaskListView(LoginRequiredMixin, ListView):
         context['completed_tasks'] = Task.objects.filter(user=self.request.user, status='done')
         context['now'] = now_dt
         return context
-
 
 
 class TaskCreateView(LoginRequiredMixin, CreateView):

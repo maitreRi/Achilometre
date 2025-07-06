@@ -3,8 +3,8 @@ from datetime import date
 from achilometre.models import Task
 from achilometre.context_processors import weather_context
 from django.core.serializers.json import DjangoJSONEncoder
-from django.utils.html import escape
 import json
+from django.urls import reverse
 
 
 class HomeView(TemplateView):
@@ -16,8 +16,10 @@ class HomeView(TemplateView):
         # Récupérer toutes les tâches
         task_events = [
             {
-                "title": f"📝 {escape(task.title)}",
-                "start": task.due_date.isoformat()
+                "title": f"📝 {(task.title)}",
+                "start": task.due_date.isoformat(),
+                "url": reverse("task_edit", args=[task.id]),
+                "color": task.color
             }
             for task in Task.objects.all()
         ]
@@ -41,7 +43,7 @@ class HomeView(TemplateView):
             print(f"Erreur récupération météo : {e}")
 
         # Fusionner événements tâches + météo UV max
-        context["calendar_events"] = json.dumps(task_events + weather_events, cls=DjangoJSONEncoder)
+        context["calendar_events"] = json.dumps(task_events + weather_events, cls=DjangoJSONEncoder, ensure_ascii=False)
 
         # Ajouter météo courante et tâches du jour pour template
         context["weather"] = weather_context(self.request)["global_weather"]

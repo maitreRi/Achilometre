@@ -1,5 +1,5 @@
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from ..models import Task
+from ..models import Task, THEME_CHOICES
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import logout
@@ -13,14 +13,22 @@ from django.utils.timezone import now, make_aware
 import json
 
 
+@csrf_exempt
+@require_POST
 def add_task_api(request):
     try:
         data = json.loads(request.body)
         title = data.get("title")
         due_date_str = data.get("due_date")
+        theme = data.get("theme", "other")
 
         if not title or not due_date_str:
             return JsonResponse({"success": False, "error": "Données incomplètes"})
+
+        # Valider le thème
+        valid_themes = dict(THEME_CHOICES).keys()
+        if theme not in valid_themes:
+            theme = "other"
 
         due_date = datetime.strptime(due_date_str, "%Y-%m-%d").date()
 
@@ -28,7 +36,8 @@ def add_task_api(request):
         task = Task.objects.create(
             title=title,
             due_date=due_date,
-            user=request.user
+            user=request.user,
+            theme=theme
         )
 
         return JsonResponse({"success": True})
@@ -83,10 +92,19 @@ class TaskListView(LoginRequiredMixin, ListView):
 
 class TaskCreateView(LoginRequiredMixin, CreateView):
     model = Task
-    fields = ['title', 'description', 'due_date', 'status']
+    fields = ['title', 'description', 'due_date', 'status', 'theme']
     template_name = 'todos/task_form.html'
-
     success_url = reverse_lazy('task_list')
+
+    def get_initial(self):
+        initial = super().get_initial()
+        date_str = self.request.GET.get('due_date')
+        if date_str:
+            try:
+                initial['due_date'] = date_str  # Django gère la conversion date string -> date field
+            except Exception:
+                pass
+        return initial
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -96,7 +114,7 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
 
 class TaskUpdateView(LoginRequiredMixin, UpdateView):
     model = Task
-    fields = ['title', 'description', 'due_date', 'status']
+    fields = ['title', 'description', 'due_date', 'status', 'theme']
     template_name = 'todos/task_form.html'
     success_url = reverse_lazy('task_list')
 

@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block title %}Pomodoro{% endblock %}
+
+{% block extra_head %}
+<style>
+  .pomodoro-timer {
+    font-size: 4rem;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 1rem;
+  }
+  .session-info {
+    text-align: center;
+    margin-top: 0.5rem;
+    font-size: 1.2rem;
+  }
+  .btn {
+    background-color: #1E90FF;
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .btn:disabled {
+    background-color: #999;
+    cursor: default;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow-md mt-6">
+  <h1 class="text-3xl font-bold text-center mb-6">Pomodoro Timer</h1>
+
+  <form id="pomodoro-form" class="space-y-4">
+    <div>
+      <label for="work-duration" class="block font-semibold mb-1">Durée travail (minutes)</label>
+      <input type="number" id="work-duration" min="1" max="180" value="25" required class="w-full border rounded px-3 py-2" />
+    </div>
+    <div>
+      <label for="break-duration" class="block font-semibold mb-1">Durée pause (minutes)</label>
+      <input type="number" id="break-duration" min="1" max="60" value="5" required class="w-full border rounded px-3 py-2" />
+    </div>
+    <div>
+      <label for="repetitions" class="block font-semibold mb-1">Nombre de répétitions</label>
+      <input type="number" id="repetitions" min="1" max="100" value="4" required class="w-full border rounded px-3 py-2" />
+    </div>
+    <div class="flex items-center space-x-2">
+      <input type="checkbox" id="infinite" />
+      <label for="infinite" class="select-none">Pomodoro infini</label>
+    </div>
+
+    <div class="session-info" id="total-duration-display">Durée totale de la session : 120 minutes</div>
+
+    <button type="button" class="btn w-full" id="startPomodoro" style="background-color: #12a2a2;">Démarrer</button>
+    <button type="button" class="btn w-full mt-2 hidden" id="stopPomodoro" style="background-color: #FF4500;">Arrêter</button>
+  </form>
+
+  <div class="pomodoro-timer hidden" id="pomodoro-timer">00:00</div>
+  <div class="session-info hidden" id="session-status">Statut : Travail</div>
+  <div class="session-info hidden" id="session-repeat">Cycle : 1 / 4</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function(){
+  // DOM elements
+  const form = document.getElementById('pomodoro-form');
+  const workInput = document.getElementById('work-duration');
+  const breakInput = document.getElementById('break-duration');
+  const repetitionsInput = document.getElementById('repetitions');
+  const infiniteCheckbox = document.getElementById('infinite');
+  const totalDurationDisplay = document.getElementById('total-duration-display');
+  const timerDisplay = document.getElementById('pomodoro-timer');
+  const startBtn = document.getElementById('startPomodoro');
+  const stopBtn = document.getElementById('stopPomodoro');
+
+  const STORAGE_KEY = 'pomodoro_state';
+
+  let timerInterval = null;
+
+  function formatTime(seconds) {
+    const m = Math.floor(seconds / 60).toString().padStart(2,'0');
+    const s = (seconds % 60).toString().padStart(2,'0');
+    return `${m}:${s}`;
+  }
+
+  function updateTotalDuration() {
+    const work = parseInt(workInput.value) || 25;
+    const brk = parseInt(breakInput.value) || 5;
+    const reps = parseInt(repetitionsInput.value) || 4;
+    const infinite = infiniteCheckbox.checked;
+
+    if (infinite) {
+      totalDurationDisplay.textContent = "Durée totale : ∞ (mode infini)";
+    } else {
+      const totalMin = (work + brk) * reps - brk;
+      totalDurationDisplay.textContent = `Durée totale : ${totalMin} min`;
+    }
+  }
+
+  // Mise à jour en live
+  workInput.addEventListener('input', updateTotalDuration);
+  breakInput.addEventListener('input', updateTotalDuration);
+  repetitionsInput.addEventListener('input', updateTotalDuration);
+  infiniteCheckbox.addEventListener('change', updateTotalDuration);
+  updateTotalDuration();
+
+  function clearTimer() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+  }
+
+  function showRunningState(isRunning) {
+    if (isRunning) {
+      startBtn.classList.add('hidden');
+      stopBtn.classList.remove('hidden');
+      timerDisplay.classList.remove('hidden');
+      totalDurationDisplay.classList.add('hidden');
+    } else {
+      startBtn.classList.remove('hidden');
+      stopBtn.classList.add('hidden');
+      timerDisplay.classList.add('hidden');
+      totalDurationDisplay.classList.remove('hidden');
+    }
+  }
+
+  function stopSession() {
+    clearTimer();
+    localStorage.removeItem(STORAGE_KEY);
+    timerDisplay.textContent = "Session arrêtée";
+    showRunningState(false);
+  }
+
+  function startSession() {
+    console.log("startSession triggered");
+
+    const work = parseInt(workInput.value) || 25;
+    const brk = parseInt(breakInput.value) || 5;
+    const reps = parseInt(repetitionsInput.value) || 4;
+    const infinite = infiniteCheckbox.checked;
+
+    const state = {
+        running: true,
+        startedAt: Date.now(),
+        workDuration: work,
+        breakDuration: brk,
+        repetitions: reps,
+        infinite: infinite,
+    };
+
+    console.log("Saving state:", state); // 👈 nouveau log
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+
+    showRunningState(true);
+    updateTimer();
+    timerInterval = setInterval(updateTimer, 1000);
+    }
+
+
+  function updateTimer() {
+    const stateRaw = localStorage.getItem(STORAGE_KEY);
+    if (!stateRaw) {
+      timerDisplay.textContent = "Pas de session active";
+      showRunningState(false);
+      clearTimer();
+      return;
+  }
+
+    let state;
+    try {
+      state = JSON.parse(stateRaw);
+    } catch {
+      timerDisplay.textContent = "Erreur lecture session";
+      clearTimer();
+      return;
+    }
+
+    if (!state.running) {
+      timerDisplay.textContent = "Pas de session active";
+      showRunningState(false);
+      clearTimer();
+      return;
+    }
+
+    const now = Date.now();
+    const elapsed = Math.floor((now - state.startedAt) / 1000);
+    const workSec = state.workDuration * 60;
+    const breakSec = state.breakDuration * 60;
+    const cycleSec = workSec + breakSec;
+
+    const cyclesCompleted = Math.floor(elapsed / cycleSec);
+
+    if (!state.infinite && cyclesCompleted >= state.repetitions) {
+      stopSession();
+      timerDisplay.textContent = "Session terminée";
+      return;
+    }
+
+    const cycleElapsed = elapsed % cycleSec;
+    let label, secondsLeft;
+    if (cycleElapsed < workSec) {
+      label = "Travail";
+      secondsLeft = workSec - cycleElapsed;
+    } else {
+      label = "Pause";
+      secondsLeft = cycleSec - cycleElapsed;
+    }
+
+    timerDisplay.textContent = `${formatTime(secondsLeft)}`;
+    document.getElementById('session-status').textContent = `Statut : ${label}`;
+    document.getElementById('session-status').classList.remove('hidden');
+    document.getElementById('session-repeat').textContent = `Cycle : ${state.infinite ? '∞' : cyclesCompleted + 1} / ${state.repetitions}`;
+    document.getElementById('session-repeat').classList.remove('hidden');
+  }
+
+  startBtn.addEventListener('click', e => {
+    e.preventDefault();
+    startSession();
+  });
+
+  stopBtn.addEventListener('click', e => {
+    e.preventDefault();
+    stopSession();
+  });
+
+  // Au chargement, reprendre session si active
+  window.addEventListener('load', () => {
+    const stateRaw = localStorage.getItem(STORAGE_KEY);
+    if (stateRaw) {
+      const state = JSON.parse(stateRaw);
+      if (state.running) {
+        showRunningState(true);
+        updateTimer();
+        timerInterval = setInterval(updateTimer, 1000);
+      } else {
+        showRunningState(false);
+      }
+    } else {
+      showRunningState(false);
+    }
+  });
+})();
+</script>
+{% endblock %}

@@ -35,8 +35,14 @@
       <ul class="list-disc ml-6 space-y-2 text-gray-800">
         {% for task in today_tasks %}
           <li>
-            <span class="font-medium">{{ task.title }}</span> 
-            {% if task.due_time %} — <span class="text-sm text-gray-500">{{ task.due_time|time:"H:i" }}</span>{% endif %}
+            <a href="{% url 'task_edit' task.id %}" class="group inline-flex items-center space-x-2">
+              <span class="{% if task.status == 'done' %}line-through text-gray-400{% else %}text-blue-600{% endif %} font-medium group-hover:underline">
+                {{ task.title }}
+              </span>
+              {% if task.due_time %}
+                <span class="text-sm text-gray-500">— {{ task.due_time|time:"H:i" }}</span>
+              {% endif %}
+            </a>
           </li>
         {% endfor %}
       </ul>

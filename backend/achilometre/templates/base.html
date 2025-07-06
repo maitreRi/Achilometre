@@ -32,7 +32,7 @@
         top: 0;
         left: 0;
         bottom: 0;
-        width: 16rem;
+        width: 13rem;
         background: white;
         padding: 1rem;
         display: flex;
@@ -106,19 +106,21 @@
 </head>
 <body>
   <aside id="sidebar" class="md:flex flex-col reduced">
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between pr-1">
         <div class="text-2xl font-bold text-blue-700 truncate transition-all duration-300">
-          <a href="{% url 'home' %}">
-            <span class="sidebar-full hidden md:inline-block">Achilomètre</span>
-            <span class="sidebar-reduced:inline md:hidden">A</span>
-          </a>
+            <a href="{% url 'home' %}">
+                <span class="sidebar-full hidden md:inline-block">Achilomètre</span>
+            </a>
         </div>
-        <button id="toggleSidebarDesktop" class="hidden md:inline-block bg-gray-200 px-2 py-1 rounded hover:bg-gray-300 ml-0">
-          ☰
+        <button id="toggleSidebarDesktop"
+                class="hidden md:inline-block bg-gray-200 px-2 py-1 rounded hover:bg-gray-300 ml-auto">
+            ☰
         </button>
     </div>
-
     <nav class="flex flex-col space-y-2 text-gray-700">
+        <a href="{% url 'home' %}" class="flex items-center gap-2 hover:text-blue-600 truncate">
+          🏠 <span class="sidebar-text hidden md:inline-block">Accueil</span>
+        </a>
         <a href="{% url 'task_list' %}" class="flex items-center gap-2 hover:text-blue-600 truncate">
           📝 <span class="sidebar-text hidden md:inline-block">Tâches</span>
         </a>
@@ -136,7 +138,7 @@
 
   <div id="overlay" class="hidden md:hidden"></div>
 
-  <main id="mainContent" class="transition-margin duration-300">
+  <main id="mainContent" class="transition-margin duration-300 mb-8 sidebar-reduced">
       {% if messages %}
       <div id="messages" class="fixed top-4 right-4 space-y-2 z-50 transition-opacity duration-500 opacity-100">
           {% for message in messages %}
@@ -312,6 +314,7 @@
           const cycleDisplay = state.infinite ? "∞" : (cyclesCompleted + 1) + " / " + state.repetitions;
 
           statusEl.textContent = `${sessionLabel} - Temps restant : ${formatTime(secondsLeft)} (Cycle ${cycleDisplay})`;
+          statusEl.style.color = (sessionLabel === "Pause") ? "green" : "#2563eb";  // vert ou bleu
         }
 
         // Mise à jour toutes les secondes

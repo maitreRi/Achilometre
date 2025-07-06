@@ -42,10 +42,9 @@ class HomeView(TemplateView):
             # En cas d’erreur, ne rien faire ou logger l’erreur
             print(f"Erreur récupération météo : {e}")
 
-        # Fusionner événements tâches + météo UV max
+        #  événements tâches + météo UV max
         context["calendar_events"] = json.dumps(task_events + weather_events, cls=DjangoJSONEncoder, ensure_ascii=False)
-
-        # Ajouter météo courante et tâches du jour pour template
+        #  météo courante et tâches du jour pour template
         context["weather"] = weather_context(self.request)["global_weather"]
         today = date.today()
         context["today_tasks"] = Task.objects.filter(due_date=today)

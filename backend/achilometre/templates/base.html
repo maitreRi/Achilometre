@@ -48,9 +48,6 @@
         padding-left: 0.5rem;
         padding-right: 0.5rem;
       }
-      #sidebar.hidden {
-        transform: translateX(-100%);
-      }
 
       #overlay {
         position: fixed;
@@ -207,15 +204,6 @@
     const mainContent = document.getElementById("mainContent");
     const toggleDesktopBtn = document.getElementById("toggleSidebarDesktop");
 
-    overlay.addEventListener("click", () => {
-      sidebar.classList.add("hidden");
-      sidebar.style.transform = "translateX(-100%)";
-      overlay.classList.remove("visible");
-      overlay.classList.add("hidden");
-      document.body.style.overflow = "";
-      mainContent.classList.remove("mobile-open");
-    });
-
     toggleDesktopBtn.addEventListener("click", () => {
       if(window.innerWidth < 768) return;
 
@@ -230,18 +218,6 @@
       }
     });
 
-    window.addEventListener("resize", () => {
-      if(window.innerWidth >= 768) {
-        if(!sidebar.classList.contains("hidden")) {
-          sidebar.classList.add("hidden");
-          sidebar.style.transform = "translateX(-100%)";
-          overlay.classList.remove("visible");
-          overlay.classList.add("hidden");
-          document.body.style.overflow = "";
-          mainContent.classList.remove("mobile-open");
-        }
-      }
-    });
   </script>
   <!-- Script Pomodoro global (timer dans footer) -->
   <script>

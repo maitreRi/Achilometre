@@ -1,106 +1,28 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr"></html>
 <head>
     <meta charset="UTF-8" />
     <title>{% block title %}Achilomètre{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     {% load static %}
     {% load tz %}
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jquery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- chess_board -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+    <!-- chess_rules -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <!-- calendrier -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.css" rel="stylesheet" />
-    <style>
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        overflow-x: hidden;
-      }
-
-      body {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-        background-color: #f3f4f6;
-      }
-
-      #sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        width: 13rem;
-        background: white;
-        padding: 1rem;
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-        box-shadow: 2px 0 8px rgb(0 0 0 / 0.1);
-        z-index: 40;
-        transition: transform 0.3s ease, width 0.3s ease;
-        transform: translateX(0);
-      }
-      #sidebar.reduced {
-        width: 2.5rem;
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
-      }
-
-      #overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.4);
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
-        z-index: 35;
-      }
-      #overlay.visible {
-        opacity: 1;
-        pointer-events: auto;
-      }
-
-      main {
-        flex-grow: 1;
-        padding: 1.5rem;
-        margin-left: 16rem;
-        transition: margin-left 0.3s ease;
-      }
-      main.sidebar-reduced {
-        margin-left: 4rem;
-      }
-      main.mobile-open {
-        margin-left: 0;
-      }
-
-      footer {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: white;
-        border-top: 1px solid #e5e7eb;
-        padding: 1rem 1.5rem;
-        font-size: 0.875rem;
-        color: #4b5563;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 0.5rem;
-        z-index: 50;
-      }
-      @media(min-width: 768px) {
-        footer {
-          flex-direction: row;
-          justify-content: space-between;
-        }
-      }
-    </style>
+    <!-- style de base -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
 </head>
+<script src="{% static 'js/sidebar.js' %}"></script>
+<script src="{% static 'js/pomodoro.js' %}"></script>
+<script src="{% static 'js/upload-bg.js' %}"></script>
 <body>
   <aside id="sidebar" class="md:flex flex-col reduced">
     <div class="flex items-center justify-between pr-1">
@@ -109,12 +31,12 @@
                 <span class="sidebar-full hidden md:inline-block">Achilomètre</span>
             </a>
         </div>
-        <button id="toggleSidebarDesktop"
-                class="hidden md:inline-block bg-gray-200 px-2 py-1 rounded hover:bg-gray-300 ml-auto">
+        <button id="toggleSidebarDesktop"aria-label="Réduire ou étendre la barre latérale"
+                class="md:inline-block bg-gray-200 px-1 py-0 rounded hover:bg-gray-300 ml-auto">
             ☰
         </button>
     </div>
-    <nav class="flex flex-col space-y-2 text-gray-700">
+    <nav class="flex flex-col space-y-2 text-gray-700" role="navigation">
         <a href="{% url 'home' %}" class="flex items-center gap-2 hover:text-blue-600 truncate">
           🏠 <span class="sidebar-text hidden md:inline-block">Accueil</span>
         </a>
@@ -132,9 +54,7 @@
         </a>
     </nav>
   </aside>
-
   <div id="overlay" class="hidden md:hidden"></div>
-
   <main id="mainContent" class="transition-margin duration-300 mb-8 sidebar-reduced">
       {% if messages %}
       <div id="messages" class="fixed top-4 right-4 space-y-2 z-50 transition-opacity duration-500 opacity-100">
@@ -185,8 +105,11 @@
       <div class="flex flex-col text-sm">
           <button id="upload-bg-btn" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Importer un fond</button>
           <input type="file" id="upload-bg-input" accept="image/*" class="hidden" />
-        </div>
-
+      </div>
+      <!-- dark-mode -->
+      <button id="dark-mode-toggle" class="text-yellow-500 text-xl hover:text-yellow-300 transition">
+          🌙
+      </button>
       <div>
           {% if user.is_authenticated %}
               <span>Bonjour, {{ user.username }} – </span>
@@ -196,159 +119,7 @@
           {% endif %}
       </div>
   </footer>
+  <script src="{% static 'js/dark-mode.js' %}"></script>
   {% block extra_js %}{% endblock extra_js %}
-  <!-- menu latéral -->
-  <script>
-    const sidebar = document.getElementById("sidebar");
-    const overlay = document.getElementById("overlay");
-    const mainContent = document.getElementById("mainContent");
-    const toggleDesktopBtn = document.getElementById("toggleSidebarDesktop");
-
-    toggleDesktopBtn.addEventListener("click", () => {
-      if(window.innerWidth < 768) return;
-
-      if(sidebar.classList.contains("reduced")) {
-        sidebar.classList.remove("reduced");
-        mainContent.classList.remove("sidebar-reduced");
-        toggleDesktopBtn.textContent = "☰";
-      } else {
-        sidebar.classList.add("reduced");
-        mainContent.classList.add("sidebar-reduced");
-        toggleDesktopBtn.textContent = "☰";
-      }
-    });
-
-  </script>
-  <!-- Script Pomodoro global (timer dans footer) -->
-  <script>
-      (() => {
-        const STORAGE_KEY = 'pomodoro_state';
-
-        function formatTime(seconds) {
-          const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-          const s = (seconds % 60).toString().padStart(2, '0');
-          return `${m}:${s}`;
-        }
-
-        // Met à jour le widget Pomodoro du header
-        function updatePomodoroWidget() {
-          const stateRaw = localStorage.getItem(STORAGE_KEY);
-          const statusEl = document.getElementById('pomodoro-status');
-
-          if (!stateRaw) {
-            statusEl.textContent = "Pas de session Pomodoro active";
-            return;
-          }
-
-          let state;
-          try {
-            state = JSON.parse(stateRaw);
-          } catch {
-            statusEl.textContent = "Pas de session Pomodoro active";
-            return;
-          }
-
-          if (!state.running) {
-            statusEl.textContent = "Pas de session Pomodoro active";
-            return;
-          }
-
-          const now = Date.now();
-          const elapsed = Math.floor((now - state.startedAt) / 1000);
-
-          // Durées en secondes
-          const workDuration = state.workDuration * 60;
-          const breakDuration = state.breakDuration * 60;
-          const cycleDuration = workDuration + breakDuration;
-
-          // Combien de cycles complets écoulés
-          let cyclesCompleted = Math.floor(elapsed / cycleDuration);
-
-          // Gestion fin session si non infini
-          if (!state.infinite && cyclesCompleted >= state.repetitions) {
-            // Fin session => clear localStorage et afficher fin
-            localStorage.removeItem(STORAGE_KEY);
-            statusEl.textContent = "Session Pomodoro terminée";
-            return;
-          }
-
-          // Temps écoulé dans le cycle courant
-          const cycleElapsed = elapsed % cycleDuration;
-
-          let secondsLeft;
-          let sessionLabel;
-
-          if (cycleElapsed < workDuration) {
-            sessionLabel = "Travail";
-            secondsLeft = workDuration - cycleElapsed;
-          } else {
-            sessionLabel = "Pause";
-            secondsLeft = cycleDuration - cycleElapsed;
-          }
-
-          // Affichage Cycle
-          const cycleDisplay = state.infinite ? "∞" : (cyclesCompleted + 1) + " / " + state.repetitions;
-
-          statusEl.textContent = `${sessionLabel} - Temps restant : ${formatTime(secondsLeft)} (Cycle ${cycleDisplay})`;
-          statusEl.style.color = (sessionLabel === "Pause") ? "green" : "#2563eb";  // vert ou bleu
-        }
-
-        // Mise à jour toutes les secondes
-        setInterval(updatePomodoroWidget, 1000);
-        // Premier appel direct
-        updatePomodoroWidget();
-      })();
-  </script>
-
-  <script>
-    (function(){
-        const uploadBtn = document.getElementById('upload-bg-btn');
-        const uploadInput = document.getElementById('upload-bg-input');
-
-        // Quand on clique sur le bouton, on ouvre la fenêtre de sélection fichier
-        uploadBtn.addEventListener('click', () => {
-        uploadInput.click();
-        });
-
-        // Quand l'utilisateur choisit un fichier
-        uploadInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        // Vérifier que c'est bien une image
-        if (!file.type.startsWith('image/')) {
-            alert('Veuillez sélectionner une image valide.');
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const imageDataUrl = event.target.result;
-
-            // Appliquer l'image en fond de body
-            document.body.style.backgroundImage = `url('${imageDataUrl}')`;
-            document.body.style.backgroundSize = 'cover';
-            document.body.style.backgroundPosition = 'center center';
-            document.body.style.backgroundRepeat = 'no-repeat';
-
-            // Sauvegarder dans localStorage pour persistance
-            localStorage.setItem('userBackground', imageDataUrl);
-        };
-
-        reader.readAsDataURL(file);
-        });
-
-        // Charger le fond sauvegardé si existe au chargement
-        window.addEventListener('load', () => {
-        const savedBg = localStorage.getItem('userBackground');
-        if (savedBg) {
-            document.body.style.backgroundImage = `url('${savedBg}')`;
-            document.body.style.backgroundSize = 'cover';
-            document.body.style.backgroundPosition = 'center center';
-            document.body.style.backgroundRepeat = 'no-repeat';
-        }
-        });
-    })();
-  </script>
-</body>
+  </body>
 </html>

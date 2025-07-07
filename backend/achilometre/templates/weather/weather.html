@@ -5,7 +5,7 @@
 {% block content %}
 <h1 class="text-2xl font-bold mb-6 text-center">🌤️ Météo à Palma de Mallorca</h1>
 
-<div class="bg-white p-6 rounded-xl shadow-md max-w-xl mx-auto">
+<div class="bg-white p-6 rounded-xl shadow-md max-w-xl mx-auto" id="card">
   {% if global_weather.error %}
     <div class="text-red-500">{{ global_weather.error }}</div>
   {% else %}
@@ -64,7 +64,7 @@
       </ul>
     </div>
     {% endif %}
-    <div class="mt-8 max-w-xl mx-auto bg-white p-6 rounded-xl shadow-md">
+    <div class="mt-8 max-w-xl mx-auto bg-white p-6 rounded-xl shadow-md" id="card">
       <h2 class="text-lg font-bold mb-4">Historique UV (2 derniers jours)</h2>
       <canvas id="historyChart" width="400" height="250"></canvas>
     </div>

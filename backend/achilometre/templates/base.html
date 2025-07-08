@@ -15,45 +15,47 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
     <!-- chess_rules -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <!-- weather -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <!-- calendrier -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.css" rel="stylesheet" />
     <!-- style de base -->
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
 </head>
-<script src="{% static 'js/sidebar.js' %}"></script>
-<script src="{% static 'js/pomodoro.js' %}"></script>
-<script src="{% static 'js/upload-bg.js' %}"></script>
-<body>
-  <aside id="sidebar" class="md:flex flex-col reduced">
-    <div class="flex items-center justify-between pr-1">
-        <div class="text-2xl font-bold text-blue-700 truncate transition-all duration-300">
-            <a href="{% url 'home' %}">
-                <span class="sidebar-full hidden md:inline-block">Achilomètre</span>
-            </a>
-        </div>
-        <button id="toggleSidebarDesktop"aria-label="Réduire ou étendre la barre latérale"
-                class="md:inline-block bg-gray-200 px-1 py-0 rounded hover:bg-gray-300 ml-auto">
-            ☰
-        </button>
-    </div>
-    <nav class="flex flex-col space-y-2 text-gray-700" role="navigation">
-        <a href="{% url 'home' %}" class="flex items-center gap-2 hover:text-blue-600 truncate">
-          🏠 <span class="sidebar-text hidden md:inline-block">Accueil</span>
-        </a>
-        <a href="{% url 'task_list' %}" class="flex items-center gap-2 hover:text-blue-600 truncate">
-          📝 <span class="sidebar-text hidden md:inline-block">Tâches</span>
-        </a>
-        <a href="{% url 'chess_room' %}" class="flex items-center gap-2 hover:text-blue-600 truncate">
-          ♟️ <span class="sidebar-text hidden md:inline-block">Échecs</span>
-        </a>
-        <a href="{% url 'weather' %}" class="flex items-center gap-2 hover:text-blue-600 truncate">
-          🌦️ <span class="sidebar-text hidden md:inline-block">Météo</span>
-        </a>
-        <a href="{% url 'pomodoro' %}" class="flex items-center gap-2 hover:text-blue-600 truncate">
-          ⏳ <span class="sidebar-text hidden md:inline-block">Pomodoro</span>
-        </a>
-    </nav>
-  </aside>
+<body class="{% if request.path != '/login/' %}has-sidebar{% endif %}">
+  {% if request.path != '/login/' %}
+    <aside id="sidebar" class="md:flex flex-col reduced">
+      <div class="flex items-center justify-between pr-1">
+          <div class="text-2xl font-bold text-blue-700 truncate transition-all duration-300">
+              <a href="{% url 'home' %}">
+                  <span class="sidebar-full hidden md:inline-block">Achilomètre</span>
+              </a>
+          </div>
+          <button id="toggleSidebarDesktop"aria-label="Réduire ou étendre la barre latérale"
+                  class="md:inline-block bg-gray-200 px-1 py-0 rounded hover:bg-gray-300 ml-auto">
+              ☰
+          </button>
+      </div>
+      <nav class="flex flex-col space-y-2 text-gray-700" role="navigation">
+          <a href="{% url 'home' %}" class="flex items-center gap-2 hover:text-blue-600 truncate">
+            🏠 <span class="sidebar-text hidden md:inline-block">Accueil</span>
+          </a>
+          <a href="{% url 'task_list' %}" class="flex items-center gap-2 hover:text-blue-600 truncate">
+            📝 <span class="sidebar-text hidden md:inline-block">Tâches</span>
+          </a>
+          <a href="{% url 'chess_room' %}" class="flex items-center gap-2 hover:text-blue-600 truncate">
+            ♟️ <span class="sidebar-text hidden md:inline-block">Échecs</span>
+          </a>
+          <a href="{% url 'weather' %}" class="flex items-center gap-2 hover:text-blue-600 truncate">
+            🌦️ <span class="sidebar-text hidden md:inline-block">Météo</span>
+          </a>
+          <a href="{% url 'pomodoro' %}" class="flex items-center gap-2 hover:text-blue-600 truncate">
+            ⏳ <span class="sidebar-text hidden md:inline-block">Pomodoro</span>
+          </a>
+      </nav>
+    </aside>
+  {% endif %}
   <div id="overlay" class="hidden md:hidden"></div>
   <main id="mainContent" class="transition-margin duration-300 mb-8 sidebar-reduced">
       {% if messages %}
@@ -83,43 +85,48 @@
 
       {% block content %}{% endblock %}
   </main>
+  {% if request.path != '/login/' %}
+    <footer>
+        {% if global_weather.error %}
+            <span class="text-red-500 text-xs">{{ global_weather.error }}</span>
+        {% else %}
+            <div class="flex items-center space-x-2">
+                <span id="weather-city">{{ global_weather.city }}</span>
+                <img src="{{ global_weather.icon }}" alt="weather icon" class="h-4 w-4" />
+                <span id="weather-uv" class="{{ global_weather.uv.value.class }}">UV: {{ global_weather.uv.value }}</span>
+                <span id="weather-time" class="text-gray-500 text-xs">{{ global_weather.localtime }}</span>
+            </div>
+        {% endif %}
 
-  <footer>
-      {% if global_weather.error %}
-          <span class="text-red-500 text-xs">{{ global_weather.error }}</span>
-      {% else %}
-          <div class="flex items-center space-x-2">
-              <span id="weather-city">{{ global_weather.city }}</span>
-              <img src="{{ global_weather.icon }}" alt="weather icon" class="h-4 w-4" />
-              <span id="weather-uv" class="{{ global_weather.uv.value.class }}">UV: {{ global_weather.uv.value }}</span>
-              <span id="weather-time" class="text-gray-500 text-xs">{{ global_weather.localtime }}</span>
-          </div>
-      {% endif %}
+        <!-- Pomodoro widget -->
+        <div id="pomodoro-widget" class="text-sm font-medium text-blue-600">
+            <span id="pomodoro-status">Pas de session Pomodoro active</span>
+        </div>
 
-      <!-- Pomodoro widget -->
-      <div id="pomodoro-widget" class="text-sm font-medium text-blue-600">
-          <span id="pomodoro-status">Pas de session Pomodoro active</span>
-      </div>
-
-      <!-- Importer fond -->
-      <div class="flex flex-col text-sm">
-          <button id="upload-bg-btn" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Importer un fond</button>
-          <input type="file" id="upload-bg-input" accept="image/*" class="hidden" />
-      </div>
-      <!-- dark-mode -->
-      <button id="dark-mode-toggle" class="text-yellow-500 text-xl hover:text-yellow-300 transition">
-          🌙
-      </button>
-      <div>
-          {% if user.is_authenticated %}
-              <span>Bonjour, {{ user.username }} – </span>
-              <a href="{% url 'logout' %}" class="text-blue-600 hover:underline">Déconnexion</a>
-              {% else %}
-              <a href="{% url 'login' %}" class="text-blue-600 hover:underline">Connexion</a>
-          {% endif %}
-      </div>
-  </footer>
+        <!-- Importer fond -->
+        <div class="flex flex-col text-sm">
+            <button id="upload-bg-btn" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Importer un fond</button>
+            <input type="file" id="upload-bg-input" accept="image/*" class="hidden" />
+        </div>
+        <!-- dark-mode -->
+        <button id="dark-mode-toggle" class="text-yellow-500 text-xl hover:text-yellow-300 transition">
+            🌙
+        </button>
+        <div>
+            {% if user.is_authenticated %}
+                <span>Bonjour, {{ user.username }} – </span>
+                <a href="{% url 'logout' %}" class="text-blue-600 hover:underline">Déconnexion</a>
+                {% else %}
+                <a href="{% url 'login' %}" class="text-blue-600 hover:underline">Connexion</a>
+            {% endif %}
+        </div>
+    </footer>
+  {% endif %}
   <script src="{% static 'js/dark-mode.js' %}"></script>
+  <script src="{% static 'js/sidebar.js' %}"></script>
+  <script src="{% static 'js/pomodoro.js' %}"></script>
+  <script src="{% static 'js/upload-bg.js' %}"></script>
+  <script src="{% static 'js/weather.js' %}"></script>
   {% block extra_js %}{% endblock extra_js %}
-  </body>
+</body>
 </html>

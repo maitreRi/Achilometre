@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Mon profil{% endblock %}
+
+{% block content %}
+<h2 class="text-2xl font-bold mb-4">Modifier mon profil</h2>
+
+<form method="post" enctype="multipart/form-data" class="bg-gray-200 p-6 rounded shadow max-w-3xl mx-auto" id="card">
+    {% csrf_token %}
+    {{ user_form.non_field_errors }}
+    {{ profile_form.non_field_errors }}
+
+    <div class="space-y-4">
+
+        <!-- Champs user_form -->
+        {% for field in user_form %}
+            <div>
+                <label class="block text-sm font-medium rounded" for="{{ field.id_for_label }}">
+                    {{ field.label_tag }}
+                </label>
+                {{ field }}
+                {% if field.errors %}
+                    <p class="text-red-500 text-sm rounded">{{ field.errors|striptags }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <!-- Champs profile_form sauf profile_image -->
+        {% for field in profile_form %}
+            {% if field.name != 'profile_image' %}
+                <div>
+                    <label class="block text-sm font-medium rounded" for="{{ field.id_for_label }}">
+                        {{ field.label_tag }}
+                    </label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <p class="text-red-500 text-sm rounded">{{ field.errors|striptags }}</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class="mt-6">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            💾 Enregistrer
+        </button>
+        <a href="{% url 'home' %}" class="ml-4 text-gray-600 hover:underline">Annuler</a>
+    </div>
+</form>
+{% endblock %}

@@ -39,9 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Tailwind
     "tailwind",
-    "theme",
     # achilometre
-    "achilometre",
+    'achilometre.apps.AchilometreConfig',
+    'theme.apps.ThemeConfig',
 ]
 
 MIDDLEWARE = [
@@ -134,3 +134,6 @@ LOGIN_REDIRECT_URL = 'task_list'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

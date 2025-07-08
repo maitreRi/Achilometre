@@ -5,7 +5,7 @@
 {% block content %}
 <h1 class="text-2xl font-bold mb-6 text-center">🌤️ Météo à Palma de Mallorca</h1>
 
-<div class="bg-white p-6 rounded-xl shadow-md max-w-xl mx-auto">
+<div class="bg-white p-6 rounded-xl shadow-md max-w-xl mx-auto" id="card">
   {% if global_weather.error %}
     <div class="text-red-500">{{ global_weather.error }}</div>
   {% else %}
@@ -64,62 +64,12 @@
       </ul>
     </div>
     {% endif %}
-    <div class="mt-8 max-w-xl mx-auto bg-white p-6 rounded-xl shadow-md">
+    <div class="mt-8 max-w-xl mx-auto bg-white p-6 rounded-xl shadow-md" id="card">
       <h2 class="text-lg font-bold mb-4">Historique UV (2 derniers jours)</h2>
       <canvas id="historyChart" width="400" height="250"></canvas>
     </div>
-  {% block extra_js %}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
-    <script>
-      const historyData = JSON.parse('{{ global_weather.history_json|escapejs }}');
-
-      const uvData = historyData.uv.map(item => ({ x: item.time, y: item.value }));
-      const ctx = document.getElementById('historyChart').getContext('2d');
-      const chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          datasets: [
-            {
-              label: 'UV',
-              data: uvData,
-              borderColor: 'orange',
-              fill: false,
-              yAxisID: 'y1'
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            x: {
-              type: 'time',
-              time: {
-                tooltipFormat: 'MMM D, HH:mm',
-                unit: 'hour',
-                displayFormats: {
-                  hour: 'HH:mm'
-                }
-              },
-              title: {
-                display: true,
-                text: 'Heure'
-              }
-            },
-            y1: {
-              position: 'left',
-              title: {
-                display: true,
-                text: 'Indice UV'
-              },
-              min: 0,
-              max: 12,
-            }
-          }
-        }
-      });
-    </script>
-
-  {% endblock %}
+  <script id="uv-history-data" type="application/json">
+    {{ global_weather.history_json|safe }}
+  </script>
 </div>
 {% endblock %}

@@ -7,7 +7,7 @@
     {% if object %}Modifier{% else %}Ajouter{% endif %} une tâche
 </h2>
 
-<form method="post" class="bg-gray-200 p-6 rounded shadow max-w-xl">
+<form method="post" class="bg-gray-200 p-6 rounded shadow max-w-xl" id="card">
     {% csrf_token %}
     {{ form.non_field_errors }}
     

@@ -6,13 +6,13 @@
 {% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-xl mt-6">
+<div class="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-xl mt-6" id="card">
     <h1 class="text-2xl font-bold mb-4">👋 Bienvenue sur Achilomètre</h1>
 
     {% if weather.error %}
       <p class="text-red-500">{{ weather.error }}</p>
     {% else %}
-      <div class="bg-blue-50 p-4 rounded mb-6 flex items-center space-x-4">
+      <div class="bg-blue-50 p-4 rounded mb-6 flex items-center space-x-4" id="card">
         <img src="{{ weather.icon }}" alt="Météo" class="w-12 h-12">
         <div>
           <p class="font-semibold">{{ weather.condition_text }}</p>
@@ -24,7 +24,7 @@
     {% endif %}
 
     <!-- Calendrier -->
-    <div class="bg-white rounded-xl shadow p-4 mt-6">
+    <div class="bg-white rounded-xl shadow p-4 mt-6" id="card">
       <h2 class="text-xl font-semibold mb-4">📆 Calendrier des tâches et météo</h2>
       <div id="calendar" class="h-[600px]"></div>
     </div>

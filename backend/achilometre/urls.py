@@ -2,9 +2,11 @@
 
 from django.contrib import admin
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from .views import todo_views, chess_room_views, weather_views, \
-                   home_views, pomodoro_views
+                   home_views, pomodoro_views, profile_views
 
 
 urlpatterns = [
@@ -50,4 +52,8 @@ urlpatterns = [
      path('pomodoro/',
           pomodoro_views.PomodoroView.as_view(),
           name='pomodoro'),
-]
+     # profil
+     path('profile/',
+          profile_views.profile_view,
+          name='profile'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

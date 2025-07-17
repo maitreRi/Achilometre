@@ -67,6 +67,10 @@
 
 {% block extra_js %}
 <script>
+  // Préchargement des sons
+const startWorkSound = new Audio("{% static 'sounds/start_work.mp3' %}");
+const endWorkSound = new Audio("{% static 'sounds/end_work.mp3' %}");
+
 (function(){
   // DOM elements
   const form = document.getElementById('pomodoro-form');
@@ -213,6 +217,16 @@
       label = "Pause";
       secondsLeft = cycleSec - cycleElapsed;
     }
+
+    if (label !== lastSessionLabel) {
+      if (label === "Travail") {
+        startWorkSound.play();
+      } else if (label === "Pause") {
+        endWorkSound.play();
+      }
+      lastSessionLabel = label;
+    }
+
 
     timerDisplay.textContent = `${formatTime(secondsLeft)}`;
     document.getElementById('session-status').textContent = `Statut : ${label}`;

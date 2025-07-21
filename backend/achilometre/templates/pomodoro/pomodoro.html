@@ -66,10 +66,14 @@
 {% endblock %}
 
 {% block extra_js %}
+{% load static %}
+
 <script>
   // Préchargement des sons
-const startWorkSound = new Audio("{% static 'sounds/start_work.mp3' %}");
-const endWorkSound = new Audio("{% static 'sounds/end_work.mp3' %}");
+
+ const startWorkSound = new Audio("{% static 'sounds/start_work.mp3' %}");
+ const endWorkSound = new Audio("{% static 'sounds/end_work.mp3' %}");
+ let lastSessionLabel = null;
 
 (function(){
   // DOM elements
@@ -82,7 +86,7 @@ const endWorkSound = new Audio("{% static 'sounds/end_work.mp3' %}");
   const timerDisplay = document.getElementById('pomodoro-timer');
   const startBtn = document.getElementById('startPomodoro');
   const stopBtn = document.getElementById('stopPomodoro');
-
+  
   const STORAGE_KEY = 'pomodoro_state';
 
   let timerInterval = null;
@@ -237,6 +241,11 @@ const endWorkSound = new Audio("{% static 'sounds/end_work.mp3' %}");
 
   startBtn.addEventListener('click', e => {
     e.preventDefault();
+
+    // Débloquer les sons en lecture silencieuse
+    startWorkSound.play().catch(() => {});
+    endWorkSound.play().catch(() => {});
+
     startSession();
   });
 

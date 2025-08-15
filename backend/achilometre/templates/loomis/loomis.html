@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Loomis - Pratique dessin{% endblock %}
+
+{% block content %}
+<div class="flex flex-col items-center space-y-4 mt-0 mb-6">
+    <h1 class="text-2xl font-bold">Entraînement Loomis</h1>
+
+    <!-- Image -->
+    <div class="w-full max-w-lg h-[400px] flex justify-center items-center border rounded shadow relative">
+        <span id="timer-overlay" class="absolute top-2 left-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded text-sm hidden">
+            0:00
+        </span>
+        <img id="loomis-image" 
+             src="{% static 'loomis/face1.jpg' %}" 
+             alt="Visage Loomis" 
+             class="max-h-full max-w-full object-contain transition-opacity duration-500 cursor-pointer">
+    </div>
+ 
+    <!-- Contrôles -->
+    <div class="flex space-x-4 items-center">
+        <label for="interval-input" class="font-medium">Intervalle (minutes) :</label>
+        <input type="number" id="interval-input" value="1" min="0.1" step="0.1" class="w-20 border rounded px-2 py-1 text-center">
+        <button id="start-btn" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">▶ Démarrer</button>
+        <button id="stop-btn" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">⏸ Pause</button>
+        <button id="next-btn" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">⏭ Suivant</button>
+    </div>
+</div>
+{% endblock %}

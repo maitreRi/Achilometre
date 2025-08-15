@@ -4,7 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from .views import todo_views, chess_room_views, weather_views, \
-                   home_views, pomodoro_views, profile_views
+                   home_views, pomodoro_views, profile_views, loomis_views
 
 
 urlpatterns = [
@@ -51,6 +51,14 @@ urlpatterns = [
      path('pomodoro/',
           pomodoro_views.PomodoroView.as_view(),
           name='pomodoro'),
+     # Loomis
+     path('loomis/',
+          loomis_views.LoomisView.as_view(),
+          name='loomis'),
+     # Loomis count
+     path("loomis/count/",
+          loomis_views.loomis_count,
+          name="loomis_count"),
      # profil
      path('profile/',
           profile_views.profile_view,

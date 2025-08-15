@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-
 {% block content %}
 <div class="max-w-5xl mx-auto mt-10 text-center">
   <h1 class="text-3xl font-bold mb-4">Salle d’échecs</h1>
@@ -15,54 +14,4 @@
     </div>
   </div>
 </div>
-
-<script>
-  const game = new Chess();
-  const board = Chessboard('board', {
-    draggable: true,
-    pieceTheme: '/static/chessboard/img/chesspieces/{piece}.png',
-    position: 'start',
-    onDrop: (source, target) => {
-      const move = game.move({
-        from: source,
-        to: target,
-        promotion: 'q'
-      });
-
-      if (move === null) return 'snapback';
-      updateHistory();
-
-      if (game.game_over()) {
-        setTimeout(() => {
-          let msg = 'Partie terminée : ';
-          if (game.in_checkmate()) msg += 'Échec et mat !';
-          else if (game.in_draw()) msg += 'Match nul.';
-          else if (game.in_stalemate()) msg += 'Pat.';
-          else msg += 'Fin de partie.';
-
-          alert(msg);
-        }, 100);
-      }
-    }
-  });
-
-  function updateHistory() {
-    const history = game.history();
-    const historyList = document.getElementById('move-history');
-    historyList.innerHTML = '';
-    history.forEach((move, index) => {
-      const li = document.createElement('li');
-      li.textContent = move;
-      historyList.appendChild(li);
-    });
-  }
-
-  document.getElementById('resetBtn').addEventListener('click', () => {
-    game.reset();
-    board.start();
-    updateHistory();
-  });
-</script>
-
-
 {% endblock %}

@@ -1,5 +1,3 @@
-# backend/achilometre/urls.py
-
 from django.contrib import admin
 from django.urls import path
 from django.conf import settings
@@ -10,6 +8,7 @@ from .views import todo_views, chess_room_views, weather_views, \
 
 
 urlpatterns = [
+     # admin
      path('admin/',
           admin.site.urls),
      # login

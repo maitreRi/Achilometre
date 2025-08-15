@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr"></html>
 <head>
-    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
     <meta charset="UTF-8" />
     <title>{% block title %}Achilomètre{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -23,6 +22,8 @@
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.css" rel="stylesheet" />
     <!-- style de base -->
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <!-- favicon -->
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
 </head>
 <body class="{% if request.path != '/login/' %}has-sidebar{% endif %}">
   {% if request.path != '/login/' %}
@@ -133,6 +134,7 @@
   <script src="{% static 'js/pomodoro.js' %}"></script>
   <script src="{% static 'js/upload-bg.js' %}"></script>
   <script src="{% static 'js/weather.js' %}"></script>
+  <script src="{% static 'js/chess_room.js' %}"></script>
   {% block extra_js %}{% endblock extra_js %}
 </body>
 </html>
